@@ -30,7 +30,12 @@ requirements:
       else:
         - ${{ stdlib("c") }}
     - ocaml-dune
-    - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
+    # win-arm64 needs ocaml >=116 (flexlink reloc order and __chkstk fixes)
+    - if: not unix and arm64
+      then:
+        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}[build_number=">=116"]
+      else:
+        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
     - if: build_platform != target_platform
       then:
         - ocaml ${{ ocaml_compiler_version }}.*
@@ -51,7 +56,11 @@ requirements:
         - ${{ m2 }}sed
   host:
     - ocaml ${{ ocaml_compiler_version }}.*
-    - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
+    - if: not unix and arm64
+      then:
+        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}[build_number=">=116"]
+      else:
+        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
 
 tests:
   # Package contents validation
