@@ -67,10 +67,10 @@ Current release info
 Installing ocaml-menhir
 =======================
 
-Installing `ocaml-menhir` from the `conda-forge` channel can be achieved by adding `conda-forge` to your channels with:
+Installing `ocaml-menhir` from the `conda-forge/label/ocaml_experimental` channel can be achieved by adding `conda-forge/label/ocaml_experimental` to your channels with:
 
 ```
-conda config --add channels conda-forge
+conda config --add channels conda-forge/label/ocaml_experimental
 conda config --set channel_priority strict
 ```
 
@@ -116,7 +116,7 @@ It is possible to list all of the versions of `ocaml-menhir` available on your p
 <summary>With conda</summary>
 
 ```
-conda search ocaml-menhir --channel conda-forge
+conda search ocaml-menhir --channel conda-forge/label/ocaml_experimental
 ```
 
 </details>
@@ -125,7 +125,7 @@ conda search ocaml-menhir --channel conda-forge
 <summary>With mamba</summary>
 
 ```
-mamba search ocaml-menhir --channel conda-forge
+mamba search ocaml-menhir --channel conda-forge/label/ocaml_experimental
 ```
 
 </details>
@@ -134,7 +134,7 @@ mamba search ocaml-menhir --channel conda-forge
 <summary>With pixi</summary>
 
 ```
-pixi search ocaml-menhir --channel conda-forge
+pixi search ocaml-menhir --channel conda-forge/label/ocaml_experimental
 ```
 
 </details>
@@ -144,13 +144,13 @@ pixi search ocaml-menhir --channel conda-forge
 
 ```
 # Search all versions available on your platform:
-mamba repoquery search ocaml-menhir --channel conda-forge
+mamba repoquery search ocaml-menhir --channel conda-forge/label/ocaml_experimental
 
 # List packages depending on `ocaml-menhir`:
-mamba repoquery whoneeds ocaml-menhir --channel conda-forge
+mamba repoquery whoneeds ocaml-menhir --channel conda-forge/label/ocaml_experimental
 
 # List dependencies of `ocaml-menhir`:
-mamba repoquery depends ocaml-menhir --channel conda-forge
+mamba repoquery depends ocaml-menhir --channel conda-forge/label/ocaml_experimental
 ```
 
 </details>
