@@ -1,7 +1,7 @@
 context:
-  build_number: 3
+  build_number: 0
   name: ocaml-menhir
-  version: "20250912"
+  version: "20230608"
 
   # ocaml_win-64 ships gcc_* and vs2022_* at the same version/build; name the track.
   c_toolchain: ${{ "" if unix else c_compiler ~ "_*" }}
@@ -15,7 +15,7 @@ package:
 
 source:
   - url: https://gitlab.inria.fr/fpottier/menhir/-/archive/${{ version }}/menhir-${{ version }}.tar.gz
-    sha256: 26b1f44d6b4ed634631c50866e5535062591308a01a987f415411a9543965c9b
+    sha256: 56fef644e71721d6a95b6f2ab1afd9a032be0d9f92b53b851aab35d9e110a9a0
 
 build:
   number: ${{ build_number }}
@@ -63,20 +63,28 @@ tests:
         - ${{ library }}doc/*
         - ${{ library }}lib/coq-menhirlib/*
         - ${{ library }}lib/menhir/*
-        - ${{ library }}lib/menhirCST/*
         - ${{ library }}lib/menhirLib/*
         - ${{ library }}lib/menhirSdk/*
         - ${{ library }}share/man/man1/menhir.1
         - etc/conda/test-files/*
 
-  # Python-based functional tests
-  - script: |
-      python testing/test-menhir-arch.py
-      python testing/test-menhir-functional.py
+  # Architecture check
+  - script: python testing/test-menhir-arch.py
     files:
       recipe:
         - testing/test_utils.py
         - testing/test-menhir-arch.py
+    requirements:
+      run:
+        - ${{ m2 }}file
+        - ocaml ${{ ocaml_compiler_version }}.*
+        - python >=3.9
+
+  # Functional tests
+  - script: python testing/test-menhir-functional.py
+    files:
+      recipe:
+        - testing/test_utils.py
         - testing/test-menhir-functional.py
     requirements:
       run:
