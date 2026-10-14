@@ -47,6 +47,9 @@ echo "=== Cross-compilation detection ==="
 echo "  CONDA_BUILD_CROSS_COMPILATION: ${CONDA_BUILD_CROSS_COMPILATION:-not set}"
 echo "  is_cross_compile: $(is_cross_compile && echo 'true' || echo 'false')"
 
+# menhir's src/dune makes warnings fatal in the dev profile; build as opam does.
+export DUNE_PROFILE=release
+
 if is_cross_compile; then
   # ===========================================================================
   # CROSS-COMPILATION PATH
