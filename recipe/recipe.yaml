@@ -1,5 +1,5 @@
 context:
-  build_number: 105
+  build_number: 8
   name: ocaml-menhir
   version: "20250912"
 
@@ -19,26 +19,34 @@ source:
 
 build:
   number: ${{ build_number }}
-  string: ${{ c_compiler ~ "_" if not unix }}h${{ hash }}_experimental_${{ build_number }}
+  string: ${{ c_compiler ~ "_" if not unix }}h${{ hash }}_${{ build_number }}
   script: build.sh
 
 requirements:
   build:
+    - ${{ compiler("ocaml") }}
+    # ocaml_<tp> self-activates for cross builds (toolchain, OCAMLLIB/OCAMLPATH, cross shims on PATH)
+    - if: build_platform != target_platform and unix
+      then:
+        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.*
     - if: not unix and c_compiler == "gcc"
       then:
         - ${{ stdlib("m2w64_c") }}
       else:
         - ${{ stdlib("c") }}
-    - ocaml-dune
-    # win-arm64 needs ocaml >=116 (flexlink reloc order and __chkstk fixes)
-    - if: not unix and arm64
+    # ocaml_win-64 >=14 only run-constrains the C compiler; activate it here, once (vs2022, zig)
+    - if: not unix and c_compiler != "gcc"
       then:
-        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}[build_number=">=116"]
-      else:
+        - ${{ compiler("c") }}
+    # compiler("ocaml") renders no toolchain track; name it on windows
+    - if: not unix
+      then:
         - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
-    - if: build_platform != target_platform
+    # windows cross: the self-contained gcc track needs no vcvars
+    - if: build_platform != target_platform and not unix
       then:
-        - ocaml ${{ ocaml_compiler_version }}.*
+        - ocaml_${{ build_platform }} ${{ ocaml_compiler_version }}.* gcc_*
+    - ocaml-dune
     - if: osx
       then:
         - llvm-tools
@@ -55,11 +63,16 @@ requirements:
         - ${{ m2 }}grep
         - ${{ m2 }}sed
   host:
+    # library: ocaml's run_export pins the compiler patch version
     - ocaml ${{ ocaml_compiler_version }}.*
-    - if: not unix and arm64
+    # the noarch ocaml metapackage does not pin the windows toolchain track
+    - if: not unix
       then:
-        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}[build_number=">=116"]
-      else:
+        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
+  # the ocaml run_export does not encode the windows toolchain track
+  run_constraints:
+    - if: not unix
+      then:
         - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
 
 tests:
@@ -90,8 +103,6 @@ tests:
       build:
         - ${{ m2 }}file
         - python >=3.9
-      run:
-        - ocaml ${{ ocaml_compiler_version }}.*
 
   # Functional tests
   - script: python testing/test-menhir-functional.py
@@ -105,8 +116,12 @@ tests:
       build:
         - ${{ m2 }}file
         - python >=3.9
+      # menhir --infer runs ocamlc -i
       run:
         - ocaml ${{ ocaml_compiler_version }}.*
+        - if: not unix
+          then:
+            - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
 
 about:
   license: GPL-2.0-only

@@ -58,16 +58,12 @@ if is_cross_compile; then
   # parsers on the target, so the menhir binary and libraries built here
   # MUST be TARGET-arch (build_platform=${build_platform}, target_platform=${target_platform}).
 
-  swap_ocaml_compilers
-  setup_cross_c_compilers
-  configure_cross_environment
-  if is_macos; then
-    create_macos_ocamlmklib_wrapper
-  fi
+  # ocaml_<tp> activation already selects the cross compiler and toolchain.
 
   echo "  ocamlc: $(command -v ocamlc)"
   ocamlc -version
-  DETECTED_ARCH=$(ocamlc -config | grep "^architecture:" | awk '{print $2}')
+  # grep -a: ocamlc -config output can trip grep's binary detection.
+  DETECTED_ARCH=$(ocamlc -config | grep -a "^architecture:" | awk '{print $2}')
   echo "  Detected OCaml target architecture: ${DETECTED_ARCH:-(undetermined)}"
   echo "  OCAMLLIB: ${OCAMLLIB:-not set}"
 
