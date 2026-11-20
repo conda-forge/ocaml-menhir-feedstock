@@ -1,5 +1,5 @@
 context:
-  build_number: 3
+  build_number: 4
   name: ocaml-menhir
   version: "20230608"
 
@@ -25,10 +25,9 @@ build:
 requirements:
   build:
     - ${{ compiler("ocaml") }}
-    # ocaml_<tp> >=18 self-activates for cross builds (toolchain, OCAMLLIB/OCAMLPATH, cross shims on PATH)
     - if: build_platform != target_platform and unix
       then:
-        - ocaml_${{ target_platform }} [version='${{ ocaml_compiler_version }}.*',build_number='>=18']
+        - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.*
     - if: not unix and c_compiler == "gcc"
       then:
         - ${{ stdlib("m2w64_c") }}
@@ -37,15 +36,12 @@ requirements:
     # ocaml_win-64 >=14 only run-constrains the C compiler; activate it here, once (vs2022, zig)
     - if: not unix and c_compiler != "gcc"
       then:
-        - ${{ compiler("c") }}
+        # zig lane: compiler("zig") reads zig_compiler_version from the pinning; compiler("c") would render zig_win-arm64 =2022
+        - ${{ compiler("zig") if c_compiler == "zig" else compiler("c") }}
     # compiler("ocaml") renders no toolchain track; name it on windows
     - if: not unix
       then:
         - ocaml_${{ target_platform }} ${{ ocaml_compiler_version }}.* ${{ c_toolchain }}
-    # the cross compiler does not pull the native one; the build runs OCaml on the build machine
-    - if: build_platform != target_platform and unix
-      then:
-        - ocaml_${{ build_platform }} ${{ ocaml_compiler_version }}.*
     # windows cross: the self-contained gcc track needs no vcvars
     - if: build_platform != target_platform and not unix
       then:
