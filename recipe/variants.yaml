@@ -1,14 +1,9 @@
-# Local override: gives windows x86_64 two toolchain lanes (vs2022/gcc) and win-arm64 a zig lane.
+# Local override: gives windows x86_64 two toolchain lanes (vs/gcc) and win-arm64 a zig lane.
 c_compiler:
   - if: not unix and x86_64
     then:
-      - vs2022
+      - vs
       - gcc
   - if: not unix and arm64
     then:
       - zig
-# ocaml 5.5.1 exists only as vs2022_*; vs2022_win-64 is versioned 19.x, so override the global 2022
-c_compiler_version:
-  - if: not unix and x86_64
-    then:
-      - "19"
