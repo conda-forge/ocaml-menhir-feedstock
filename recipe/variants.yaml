@@ -7,12 +7,3 @@ c_compiler:
   - if: not unix and arm64
     then:
       - zig
-
-# experimental: build against and upload to the ocaml_vs label
-ocaml_compiler_version:
-  - "5.5.2"
-
-channel_sources:
-  - conda-forge/label/ocaml_vs,conda-forge
-channel_targets:
-  - conda-forge ocaml_vs

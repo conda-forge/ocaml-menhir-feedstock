@@ -1,5 +1,5 @@
 context:
-  build_number: 110
+  build_number: 9
   name: ocaml-menhir
   version: "20250912"
 
@@ -35,9 +35,9 @@ requirements:
       else:
         - ${{ stdlib("c") }}
     # ocaml_win-64 >=14 only run-constrains the C compiler; activate it here, once (vs, zig)
-    # zig lane: compiler("zig") reads zig_compiler_version from the pinning; compiler("c") would render zig_win-arm64 =2022
     - if: not unix and c_compiler != "gcc"
       then:
+        # zig lane: compiler("zig") reads zig_compiler_version from the pinning; compiler("c") would render zig_win-arm64 =2022
         - ${{ compiler("zig") if c_compiler == "zig" else compiler("c") }}
     # compiler("ocaml") renders no toolchain track; name it on windows
     - if: not unix
